@@ -44,7 +44,7 @@ class Day1Test : FunSpec({
         """.trimIndent()
 
         measureTime { solvePart2(input) shouldBe 6 }.also { println(it) }
-        measureTime { solvePart2(readFile("day1/input.txt")) shouldBe 1180 }.also { println(it) }
+        measureTime { solvePart2(readFile("day1/input.txt")) shouldBe 6892 }.also { println(it) }
     }
 })
 
@@ -59,25 +59,6 @@ fun solvePart1V2(input: String): Int {
     return amountOfTimesAt0
 }
 
-fun solvePart1(input: String): Int {
-    val dial = input.lines().fold(Dial(arrow = 50)) { acc, instr ->
-        val turnedDial = if (instr.startsWith("L")) acc.left(instr.drop(1).toInt())
-        else acc.right(instr.drop(1).toInt())
-        turnedDial
-            .let { dial -> if (dial.arrow == 0) dial.copy(amountOfTimesAt0 = dial.amountOfTimesAt0+1) else dial }
-    }
-    return dial.amountOfTimesAt0
-}
-
-
-fun solvePart2(input: String): Int {
-    val dial = input.lines().fold(Dial2(arrow = 50)) { acc, instr ->
-        if (instr.startsWith("L")) acc.left(instr.drop(1).toInt())
-        else acc.right(instr.drop(1).toInt())
-    }
-    return dial.amountOfTimesAt0
-}
-
 class MutableDial(arrow: Int) {
     var arrow: Int = arrow
         private set
@@ -89,13 +70,41 @@ class MutableDial(arrow: Int) {
     }
 }
 
+fun solvePart1(input: String): Int {
+    val dial = input.lines().fold(Dial(arrow = 50)) { acc, instr ->
+        val turnedDial = if (instr.startsWith("L")) acc.left(instr.drop(1).toInt())
+        else acc.right(instr.drop(1).toInt())
+        turnedDial
+            .let { dial -> if (dial.arrow == 0) dial.copy(amountOfTimesAt0 = dial.amountOfTimesAt0+1) else dial }
+    }
+    return dial.amountOfTimesAt0
+}
+
 data class Dial(val arrow: Int, val amountOfTimesAt0: Int = 0) {
     fun left(distance: Int): Dial = copy(arrow = (arrow - distance).mod(100))
     fun right(distance: Int): Dial = copy(arrow = (arrow + distance).mod(100))
 }
 
+fun solvePart2(input: String): Int {
+    fun String.distance(): Int = this.drop(1).toInt()
+
+    val dial = input.lines().fold(Dial2(arrow = 50)) { acc, instr ->
+        when {
+            instr.startsWith("L") -> acc.left(instr.distance())
+            instr.startsWith("R") -> acc.right(instr.distance())
+            else -> error("unrecognized direction: $instr")
+        }
+    }
+    return dial.amountOfTimesAt0
+}
+
 data class Dial2(val arrow: Int, val amountOfTimesAt0: Int = 0) {
-    fun left(distance: Int): Dial2 = (1..distance).fold(this) { acc, _ -> acc.copy(arrow = (acc.arrow - 1).mod(100)).password() }
-    fun right(distance: Int): Dial2 = (1..distance).fold(this) { acc, _ -> acc.copy(arrow = (acc.arrow + 1).mod(100)).password() }
-    fun password() = (if (arrow == 0) copy(amountOfTimesAt0 = amountOfTimesAt0 + 1) else this)
+    fun left(distance: Int): Dial2 = turn(distance, Dial2::left)
+    fun right(distance: Int): Dial2 = turn(distance, Dial2::right)
+
+    private fun turn(distance: Int, direction: Dial2.() -> Dial2) = (1..distance).fold(this) { acc, _ -> acc.direction().password() }
+    private fun password() = if (arrow == 0) copy(amountOfTimesAt0 = amountOfTimesAt0 + 1) else this
+
+    private fun right() = copy(arrow = (arrow + 1).mod(100))
+    private fun left() = copy(arrow = (arrow - 1).mod(100))
 }
