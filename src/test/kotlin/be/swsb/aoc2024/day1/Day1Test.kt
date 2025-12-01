@@ -22,15 +22,15 @@ class Day1Test : FunSpec({
             L82
         """.trimIndent()
 
-        measureTime { solve(input) shouldBe 3 }.also { println(it) }
-        measureTime { solve(readFile("day1/input.txt")) shouldBe 1180 }.also { println(it) }
+        measureTime { solvePart1(input) shouldBe 3 }.also { println(it) }
+        measureTime { solvePart1(readFile("day1/input.txt")) shouldBe 1180 }.also { println(it) }
 
-        measureTime { solveV2(input) shouldBe 3 }.also { println(it) }
-        measureTime { solveV2(readFile("day1/input.txt")) shouldBe 1180 }.also { println(it) }
+        measureTime { solvePart1V2(input) shouldBe 3 }.also { println(it) }
+        measureTime { solvePart1V2(readFile("day1/input.txt")) shouldBe 1180 }.also { println(it) }
     }
 })
 
-fun solveV2(input: String): Int {
+fun solvePart1V2(input: String): Int {
     var amountOfTimesAt0 = 0
     val dial = MutableDial(50)
     for (line in input.lines()) {
@@ -41,7 +41,7 @@ fun solveV2(input: String): Int {
     return amountOfTimesAt0
 }
 
-fun solve(input: String): Int {
+fun solvePart1(input: String): Int {
     val dial = input.lines().fold(Dial(arrow = 50)) { acc, instr ->
         val turnedDial = if (instr.startsWith("L")) acc.left(instr.drop(1).toInt())
         else acc.right(instr.drop(1).toInt())
