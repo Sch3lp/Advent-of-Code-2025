@@ -1,91 +1,42 @@
 package be.swsb.aoc2024.day1
 
-import be.swsb.aoc2024.day1.Day1.Distance.Companion.sum
-import be.swsb.aoc2024.day1.Day1.SimilarityScore.Companion.sum
-import be.swsb.aoc2024.day1.Day1.solve
-import be.swsb.aoc2024.day1.Day1.solve2
 import be.swsb.aoc2024.util.readFile
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.equals.shouldBeEqual
-import kotlin.math.absoluteValue
+import io.kotest.matchers.shouldBe
 
-typealias LocationPair = Pair<Day1.LocationId, Day1.LocationId>
 
 class Day1Test : FunSpec({
 
-    test("example input part 1") {
-        val input = readFile("day1/exampleInput.txt")
-        input.solve() shouldBeEqual 11
-    }
+    test("part 1") {
+        val input = """
+            L68
+            L30
+            R48
+            L5
+            R60
+            L55
+            L1
+            L99
+            R14
+            L82
+        """.trimIndent()
 
-    test("actual input part 1") {
-        val input = readFile("day1/input.txt")
-        input.solve() shouldBeEqual 2756096
-    }
-
-    test("example input part 2") {
-        val input = readFile("day1/exampleInput.txt")
-        input.solve2() shouldBeEqual 31
-    }
-
-    test("actual input part 2") {
-        val input = readFile("day1/input.txt")
-        input.solve2() shouldBeEqual 23117829
+        solve(input) shouldBe 3
+        solve(readFile("day1/input.txt")) shouldBe 1180
     }
 })
 
-object Day1 {
-    fun String.solve(): Long {
-        val (left, right) = extractLocationIds()
-        val sortedLocationPairs = left.sorted().zip(right.sorted())
-        val distances = sortedLocationPairs.map{ it.distance() }
-        return distances.sum()
+fun solve(input: String): Int {
+    val dial = input.lines().fold(Dial(arrow = 50)) { acc, instr ->
+        val turnedDial = if (instr.startsWith("L")) acc.left(instr.drop(1).toInt())
+        else acc.right(instr.drop(1).toInt())
+        turnedDial
+            .let { dial -> if (dial.arrow == 0) dial.copy(amountOfTimesAt0 = dial.amountOfTimesAt0+1) else dial }
     }
+    return dial.amountOfTimesAt0
+}
 
-    fun String.solve2(): Long {
-        val (left, right) = extractLocationIds()
-        val leftSimilarities = left.map { locationId -> locationId.similaritiesIn(right) }
-        val similarityScores = leftSimilarities.map(Similarity::similarityScore)
-        return similarityScores.sum()
-    }
-
-    private fun String.extractLocationIds(): Pair<List<LocationId>, List<LocationId>> {
-        val locationIdPairs = lines().map { line ->
-            line.split("   ").let { (left, right) ->
-                left.toLocationId() to right.toLocationId()
-            }
-        }
-        return locationIdPairs.unzip()
-    }
-
-    private fun String.toLocationId() = LocationId(this.toLong())
-    @JvmInline
-    value class LocationId(private val value: Long) : Comparable<LocationId> {
-        override fun compareTo(other: LocationId): Int = this.value.compareTo(other.value)
-        fun distanceTo(other: LocationId) = Distance((this.value - other.value))
-        operator fun times(occurrences: Int): SimilarityScore = SimilarityScore(this.value * occurrences)
-        fun similaritiesIn(locationIds: List<LocationId>) = Similarity(this, locationIds.count { this == it })
-    }
-
-    private fun LocationPair.distance() = first.distanceTo(second)
-
-    data class Distance(private val value: Long) : Comparable<Distance> {
-        private val absoluteValue = value.absoluteValue
-        override fun compareTo(other: Distance): Int = this.absoluteValue.compareTo(other.absoluteValue)
-
-        companion object {
-            fun List<Distance>.sum() = sumOf { it.absoluteValue }
-        }
-    }
-
-    data class Similarity(private val locationId: LocationId, private val occurrences: Int) {
-        val similarityScore: SimilarityScore get() = locationId * occurrences
-    }
-
-    @JvmInline
-    value class SimilarityScore(private val value: Long) {
-        companion object {
-            fun List<SimilarityScore>.sum() = sumOf { it.value }
-        }
-    }
+data class Dial(val arrow: Int, val amountOfTimesAt0: Int = 0) {
+    fun left(distance: Int): Dial = copy(arrow = (arrow - distance).mod(100))
+    fun right(distance: Int): Dial = copy(arrow = (arrow + distance).mod(100))
 }

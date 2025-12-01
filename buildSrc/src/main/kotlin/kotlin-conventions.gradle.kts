@@ -33,7 +33,7 @@ tasks.test {
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_2_1)
+        languageVersion.set(KotlinVersion.KOTLIN_2_2)
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
