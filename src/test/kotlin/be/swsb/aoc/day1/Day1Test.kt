@@ -1,6 +1,6 @@
-package be.swsb.aoc2024.day1
+package be.swsb.aoc.day1
 
-import be.swsb.aoc2024.util.readFile
+import be.swsb.aoc.util.readFile
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlin.time.measureTime

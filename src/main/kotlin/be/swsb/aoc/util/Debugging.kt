@@ -1,4 +1,4 @@
-package be.swsb.aoc2024.util
+package be.swsb.aoc.util
 
 object Debugging {
     private var debugEnabled = false

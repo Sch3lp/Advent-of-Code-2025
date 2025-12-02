@@ -1,9 +1,8 @@
-package be.swsb.aoc2024
+package be.swsb.aoc
 
-import be.swsb.aoc2024.util.Point
+import be.swsb.aoc.util.Point
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder

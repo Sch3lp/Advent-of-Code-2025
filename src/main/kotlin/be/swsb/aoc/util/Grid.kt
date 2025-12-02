@@ -1,4 +1,4 @@
-package be.swsb.aoc2024.util
+package be.swsb.aoc.util
 
 fun parseToGrid(input: String): Map<Point, Char> = input.lines()
     .flatMapIndexed { y, line ->

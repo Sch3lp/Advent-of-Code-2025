@@ -1,4 +1,4 @@
-package be.swsb.aoc2024
+package be.swsb.aoc
 
 interface Node {
     fun isStart(): Boolean
