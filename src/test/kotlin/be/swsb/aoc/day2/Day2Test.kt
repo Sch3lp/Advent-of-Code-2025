@@ -17,22 +17,22 @@ class Day2Test : FunSpec({
     }
 
     test("id is invalid when sequence of digits repeats twice") {
-        isInvalid(99L) shouldBe true
-        isInvalid(1188511885L) shouldBe true
+        isInvalidPart1(99L) shouldBe true
+        isInvalidPart1(1188511885L) shouldBe true
     }
 })
 
 fun solvePart1(input: String) = input
     .toIdPairs()
     .toRanges()
-    .keepInvalidIds()
+    .keepInvalidIds(::isInvalidPart1)
     .sum()
 
 private fun List<Pair<Long, Long>>.toRanges() = map { (l,r) -> l..r }
 
-private fun List<LongRange>.keepInvalidIds() = flatMap { idRange -> idRange.filter(::isInvalid) }
+private fun List<LongRange>.keepInvalidIds(isInvalidId: (Long) -> Boolean) = flatMap { idRange -> idRange.filter(isInvalidId) }
 
-fun isInvalid(id: Long): Boolean {
+fun isInvalidPart1(id: Long): Boolean {
     val idAsString = id.toString()
     val length = idAsString.length
     return if (length % 2 != 0) false
